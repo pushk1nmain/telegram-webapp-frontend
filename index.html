@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучающий курс - Telegram WebApp</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+    <div class="container">
+        <div class="content-card">
+            <div class="image-container">
+                <div class="course-image" id="courseImage"></div>
+            </div>
+            
+            <div class="text-content" id="textContent">
+                <!-- Контент будет загружен из data.js -->
+            </div>
+            
+            <div class="buttons-container" id="buttonsContainer">
+                <!-- Кнопки будут загружены из data.js -->
+            </div>
+            
+            <div class="progress-indicator" id="progressIndicator">
+                <!-- Индикаторы прогресса -->
+            </div>
+        </div>
+        
+        <!-- Telegram WebApp индикаторы -->
+        <div class="webapp-info" id="webAppInfo" style="display: none;">
+            <small>User ID: <span id="userId"></span></small>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

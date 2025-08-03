@@ -1,0 +1,289 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Переменные для Telegram тем */
+    --tg-theme-bg-color: var(--tg-theme-bg-color, #ffffff);
+    --tg-theme-text-color: var(--tg-theme-text-color, #000000);
+    --tg-theme-hint-color: var(--tg-theme-hint-color, #999999);
+    --tg-theme-link-color: var(--tg-theme-link-color, #2481cc);
+    --tg-theme-button-color: var(--tg-theme-button-color, #2481cc);
+    --tg-theme-button-text-color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    
+    /* Fallback градиент для браузера */
+    background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 50%, #f0f2f5 100%);
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.content-card {
+    background: var(--tg-theme-bg-color);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.image-container {
+    margin-bottom: 24px;
+}
+
+.course-image {
+    width: 100%;
+    max-width: 280px;
+    height: 160px;
+    border-radius: 12px;
+    margin: 0 auto;
+    position: relative;  
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #87ceeb);
+}
+
+.course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+}
+
+.course-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--tg-theme-button-text-color);
+    background: linear-gradient(135deg, var(--tg-theme-button-color), #87ceeb);
+    border-radius: 12px;
+}
+
+.text-content {
+    color: var(--tg-theme-text-color);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.text-content h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: var(--tg-theme-text-color);
+    font-weight: 600;
+}
+
+.text-content p {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--tg-theme-hint-color);
+}
+
+.input-container {
+    margin: 16px 0;
+}
+
+.input-field {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px 16px;
+    border: 2px solid var(--tg-theme-button-color);
+    border-radius: 12px;
+    font-size: 16px;
+    text-align: center;
+    background: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
+    transition: all 0.3s ease;
+    outline: none;
+    margin-bottom: 8px;
+}
+
+.input-field:focus {
+    border-color: var(--tg-theme-link-color);
+    box-shadow: 0 0 0 3px rgba(36, 129, 204, 0.1);
+}
+
+.input-field::placeholder {
+    color: var(--tg-theme-hint-color);
+    opacity: 0.7;
+}
+
+.input-error {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 4px;
+    text-align: center;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(36, 129, 204, 0.3);
+    filter: brightness(1.05);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.progress-indicator {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tg-theme-hint-color);
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    background: var(--tg-theme-button-color);
+    opacity: 1;
+    transform: scale(1.3);
+}
+
+.webapp-info {
+    margin-top: 16px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Адаптация для темной темы Telegram */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+    }
+    
+    .content-card {
+        box-shadow: 0 2px 16px rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .input-error {
+        background: rgba(231, 76, 60, 0.2);
+    }
+    
+    .webapp-info {
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
+    
+    .content-card {
+        padding: 20px 16px;
+        border-radius: 12px;
+    }
+    
+    .course-image {
+        max-width: 240px;
+        height: 135px;
+    }
+    
+    .text-content h2 {
+        font-size: 20px;
+    }
+    
+    .text-content p {
+        font-size: 15px;
+    }
+    
+    .input-field {
+        font-size: 16px; /* Предотвращает zoom на iOS */
+        max-width: 100%;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 15px;
+        min-width: 140px;
+    }
+}
+
+/* Специальные стили для WebView */
+@media screen and (max-height: 600px) {
+    .container {
+        justify-content: flex-start;
+        padding-top: 20px;
+    }
+    
+    .course-image {
+        height: 120px;
+    }
+    
+    .content-card {
+        padding: 16px;
+    }
+}
