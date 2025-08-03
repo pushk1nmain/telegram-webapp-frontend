@@ -32,40 +32,6 @@ const courseData = {
     ]
 };
 
-// Конфигурация API для Telegram WebApp
-const CONFIG = {
-    // Определяем среду
-    API_BASE_URL: (() => {
-        const protocol = window.location.protocol;
-        
-        if (protocol === 'file:') {
-            // Локальная разработка - прямо к вашему API серверу
-            return 'https://webapp.smokybot.com/api/v1';
-        } else if (window.location.hostname === 'localhost') {
-            // Локальный сервер для разработки
-            return 'https://webapp.smokybot.com/api/v1';  
-        } else {
-            // Продакшен - через nginx
-            return '/api/v1';
-        }
-    })(),
-    
-    ENDPOINTS: {
-        USERS: '/users',
-        USER_UPDATE: '/users/{telegram_id}',
-        HEALTH: '/health'
-    },
-    
-    TELEGRAM: {
-        BOT_USERNAME: 'smokyaibot',
-        initData: null,
-        user: null,
-        isExpanded: false
-    },
-    
-    // Режим разработки
-    DEBUG: window.location.protocol === 'file:' || window.location.hostname === 'localhost'
-};
 
 // Получение полного URL API
 function getApiUrl(endpoint, params = {}) {
