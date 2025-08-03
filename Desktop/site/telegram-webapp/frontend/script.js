@@ -264,6 +264,13 @@ async function submitName() {
     } catch (error) {
         console.error('❌ Полная ошибка сохранения имени:', error);
         
+        // Показываем детальную ошибку через алерт для отладки
+        if (Telegram.WebApp) {
+            Telegram.WebApp.showAlert(`ОШИБКА ОТЛАДКИ:\n${error.message}\n\nТип: ${error.name}\nСтек: ${error.stack?.slice(0, 200)}`);
+        } else {
+            alert(`ОШИБКА: ${error.message}`);
+        }
+        
         // Показываем более детальную ошибку пользователю
         let userMessage = 'Ошибка сохранения. Попробуйте еще раз.';
         if (error.message.includes('404')) {
