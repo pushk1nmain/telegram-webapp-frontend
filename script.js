@@ -355,3 +355,44 @@ document.addEventListener('keydown', function(e) {
         handleButtonClick('prev');
     }
 });
+// Отладочная инициализация приложения
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM загружен, начинаем инициализацию...');
+    
+    // Проверяем доступность данных
+    console.log('📊 courseData доступны:', typeof courseData !== 'undefined' ? 'Да' : 'Нет');
+    if (typeof courseData !== 'undefined') {
+        console.log('📝 Количество блоков:', courseData.blocks?.length || 'undefined');
+        console.log('🎯 Первый блок:', courseData.blocks?.[0] || 'undefined');
+    }
+    
+    // Проверяем DOM элементы
+    const textContent = document.getElementById('textContent');
+    const buttonsContainer = document.getElementById('buttonsContainer');
+    const courseImage = document.getElementById('courseImage');
+    
+    console.log('🔍 DOM элементы:');
+    console.log('  - textContent:', textContent ? 'Найден' : 'НЕ НАЙДЕН');
+    console.log('  - buttonsContainer:', buttonsContainer ? 'Найден' : 'НЕ НАЙДЕН');
+    console.log('  - courseImage:', courseImage ? 'Найден' : 'НЕ НАЙДЕН');
+    
+    // Инициализируем Telegram WebApp
+    console.log('📱 Инициализируем Telegram WebApp...');
+    try {
+        initTelegramWebApp();
+        console.log('✅ Telegram WebApp инициализирован');
+    } catch (e) {
+        console.error('❌ Ошибка инициализации Telegram WebApp:', e);
+    }
+    
+    // Отрисовываем первый блок контента
+    console.log('🎨 Отрисовываем первый блок...');
+    try {
+        renderBlock(currentBlock);
+        console.log('✅ Блок отрисован');
+    } catch (e) {
+        console.error('❌ Ошибка отрисовки блока:', e);
+    }
+    
+    console.log('🏁 Инициализация завершена!');
+});
