@@ -30,12 +30,6 @@ function initTelegramWebApp() {
             
             console.log('Telegram User:', telegramUser);
             
-            // Показываем информацию о пользователе (для отладки)
-            const userIdElement = document.getElementById('userId');
-            if (userIdElement) {
-                userIdElement.textContent = telegramUser.id;
-                document.getElementById('webAppInfo').style.display = 'block';
-            }
             
             // Автоматически создаем/обновляем пользователя в БД
             createOrUpdateUser();
