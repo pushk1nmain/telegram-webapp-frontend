@@ -1,4 +1,11 @@
 // Telegram WebApp интеграция
+// ОТЛАДКА: Показываем что новый код загрузился
+if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+    Telegram.WebApp.showAlert('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v3');
+} else {
+    console.log('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v3 (без Telegram)');
+}
+
 let currentBlock = 0;
 let telegramUser = null;
 let userData = {
