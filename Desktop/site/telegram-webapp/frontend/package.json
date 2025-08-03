@@ -1,0 +1,15 @@
+{
+    "name": "telegram-webapp-frontend",
+    "version": "1.0.0",
+    "description": "Frontend для Telegram WebApp - обучающий курс",
+      "scripts": {
+    "dev": "python -m http.server 3000",
+    "serve": "python -m http.server 8080",
+    "build": "echo 'Статические файлы готовы к деплою'",
+    "test": "echo 'Тестирование в Telegram WebApp'",
+    "deploy": "vercel --prod"
+  },
+    "keywords": ["telegram", "webapp", "education", "course"],
+    "author": "",
+    "license": "MIT"
+  }
