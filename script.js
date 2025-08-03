@@ -324,10 +324,17 @@ function handleButtonClick(action) {
     }
 }
 
-// Инициализация при загрузке
+// Инициализация приложения при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM загружен, начинаем инициализацию...');
+    
+    // Инициализируем Telegram WebApp
     initTelegramWebApp();
+    
+    // Отрисовываем первый блок контента
     renderBlock(currentBlock);
+    
+    console.log('Инициализация завершена');
 });
 
 // Поддержка клавиатуры
