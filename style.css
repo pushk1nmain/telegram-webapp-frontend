@@ -3,10 +3,19 @@
     padding: 0;
     box-sizing: border-box;
 }
+html {
+    background: #e8f5e8 !important;
+}
 
+
+/* Принудительно светлая тема для Telegram WebApp */
+:root {
+    --tg-theme-bg-color: #e8f5e8 !important;
+    --tg-theme-secondary-bg-color: #f0f8ff !important;
+}
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 50%, #e8f5e8 100%);
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 50%, #e8f5e8 100%) !important;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
