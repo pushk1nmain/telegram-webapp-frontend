@@ -50,83 +50,106 @@ let userData = {
 // Инициализация Telegram WebApp
 function initTelegramWebApp() {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        debugLog('📱 Telegram WebApp найден - инициализация...');
         const webapp = Telegram.WebApp;
         
-        // Расширяем WebApp на весь экран
-        webapp.expand();
-        
-        // Включаем кнопку закрытия
-        webapp.enableClosingConfirmation();
-        
-        // Настраиваем цвета под тему Telegram
-        webapp.setHeaderColor(webapp.themeParams.bg_color || '#ffffff');
-        
-        // Получаем данные пользователя
-        if (webapp.initDataUnsafe && webapp.initDataUnsafe.user) {
-            telegramUser = webapp.initDataUnsafe.user;
-            userData.telegram_id = telegramUser.id;
-            userData.username = telegramUser.username || '';
+        try {
+            // Расширяем WebApp на весь экран
+            webapp.expand();
             
-            console.log('Telegram User:', telegramUser);
+            // Включаем кнопку закрытия
+            webapp.enableClosingConfirmation();
             
+            // Настраиваем цвета под тему Telegram
+            webapp.setHeaderColor(webapp.themeParams.bg_color || '#ffffff');
             
-            // Автоматически создаем/обновляем пользователя в БД
-            // Пользователь уже создан в боте при /start, только получаем данные
+            // Получаем данные пользователя
+            if (webapp.initDataUnsafe && webapp.initDataUnsafe.user) {
+                telegramUser = webapp.initDataUnsafe.user;
+                userData.telegram_id = telegramUser.id;
+                userData.username = telegramUser.username || '';
+                
+                debugLog('👤 Telegram User найден: ' + telegramUser.id);
+            } else {
+                debugLog('⚠️ Telegram User данные не найдены - используем тестовый ID');
+                userData.telegram_id = Date.now(); // Тестовый ID
+            }
+            
+            // Обработчик кнопки "Назад" в Telegram
+            webapp.onEvent('backButtonClicked', () => {
+                if (currentBlock > 0) {
+                    handleButtonClick('prev');
+                } else {
+                    webapp.close();
+                }
+            });
+            
+            CONFIG.TELEGRAM = {
+                initData: webapp.initData,
+                user: telegramUser,
+                isExpanded: webapp.isExpanded
+            };
+            
+            debugLog('✅ Telegram WebApp инициализирован успешно');
+            
+        } catch (e) {
+            debugLog('❌ Ошибка инициализации Telegram WebApp: ' + e.message, 'error');
+            // Продолжаем работу с тестовыми данными
+            userData.telegram_id = Date.now();
         }
         
-        // Обработчик кнопки "Назад" в Telegram
-        webapp.onEvent('backButtonClicked', () => {
-            if (currentBlock > 0) {
-                handleButtonClick('prev');
-            } else {
-                webapp.close();
-            }
-        });
-        
-        CONFIG.TELEGRAM = {
-            initData: webapp.initData,
-            user: telegramUser,
-            isExpanded: webapp.isExpanded
-        };
-        
     } else {
-        console.warn('Telegram WebApp SDK не найден. Работаем в режиме отладки.');
-        // Для тестирования без Telegram
-        userData.telegram_id = Date.now(); // Временный ID
+        debugLog('🌐 Telegram WebApp недоступен - режим браузера');
+        // Для тестирования в обычном браузере
+        userData.telegram_id = Date.now(); // Временный ID для браузера
+        userData.username = 'browser_user';
+        debugLog('🆔 Создан тестовый telegram_id: ' + userData.telegram_id);
     }
 }
 
 // Создание или обновление пользователя в БД
 async function createOrUpdateUser() {
-    if (!userData.telegram_id) return;
+    if (!userData.telegram_id) {
+        debugLog('⚠️ Нет telegram_id для создания пользователя');
+        return;
+    }
     
     try {
+        debugLog('👤 Создаем пользователя с ID: ' + userData.telegram_id);
+        
         const response = await fetch(getApiUrl(CONFIG.ENDPOINTS.USERS), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Telegram-Init-Data': CONFIG.TELEGRAM.initData || ''
+                'X-Telegram-Init-Data': CONFIG.TELEGRAM?.initData || 'DEBUG_MODE'
             },
             body: JSON.stringify({
                 telegram_id: userData.telegram_id,
-                username: userData.username
+                username: userData.username || 'browser_user'
             })
         });
         
+        debugLog('👤 Ответ на создание пользователя: ' + response.status);
+        
         if (response.ok) {
             const result = await response.json();
-            console.log('Пользователь создан/обновлен:', result);
+            debugLog('✅ Пользователь создан/обновлен: ' + JSON.stringify(result));
             
             // Если у пользователя уже есть имя, заполняем
-            if (result.user.name && result.user.name !== 'Друг') {
+            if (result.user && result.user.name && result.user.name !== 'Друг') {
                 userData.name = result.user.name;
+                debugLog('📝 Загружено имя из БД: ' + result.user.name);
             }
-            if (result.user.town && result.user.town !== 'Чудесный город') {
+            if (result.user && result.user.town && result.user.town !== 'Чудесный город') {
                 userData.town = result.user.town;
+                debugLog('🏙️ Загружен город из БД: ' + result.user.town);
             }
+        } else {
+            const errorText = await response.text();
+            debugLog('❌ Ошибка создания пользователя: ' + response.status + ' - ' + errorText, 'error');
         }
     } catch (error) {
-        console.error('Ошибка создания пользователя:', error);
+        debugLog('❌ Исключение при создании пользователя: ' + error.message, 'error');
     }
 }
 
