@@ -1,16 +1,41 @@
+// Функция для видимых логов отладки
+function debugLog(message, type = 'info') {
+    console.log(message); // Дублируем в консоль
+    
+    if (CONFIG.DEBUG) {
+        const debugDiv = document.getElementById('debugLog');
+        if (debugDiv) {
+            debugDiv.style.display = 'block';
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6b6b' : '#00ff00';
+            debugDiv.innerHTML += `<div style="color: ${color}; margin: 2px 0;">[${time}] ${message}</div>`;
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+            
+            // Ограничиваем количество строк
+            const lines = debugDiv.children;
+            if (lines.length > 50) {
+                lines[0].remove();
+            }
+        }
+    }
+}
+
 // Telegram WebApp интеграция
 // ОТЛАДКА: Показываем что новый код загрузился  
-console.log('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v4');
-console.log('🔧 DEBUG: Telegram.WebApp доступен:', typeof Telegram !== 'undefined' && Telegram.WebApp ? 'ДА' : 'НЕТ');
+debugLog('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v5');
+debugLog('🔧 DEBUG: Telegram.WebApp доступен: ' + (typeof Telegram !== 'undefined' && Telegram.WebApp ? 'ДА' : 'НЕТ'));
 
 // Пробуем и алерт и консоль
 if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
     try {
-        Telegram.WebApp.showAlert('🚀 DEBUG: Новый код загружен! v4');
-        console.log('✅ DEBUG: Алерт отправлен');
+        debugLog('✅ DEBUG: Telegram WebApp найден, пытаемся показать алерт');
+        Telegram.WebApp.showAlert('🚀 DEBUG: Новый код загружен! v5');
+        debugLog('✅ DEBUG: Алерт отправлен успешно');
     } catch (e) {
-        console.log('❌ DEBUG: Ошибка алерта:', e);
+        debugLog('❌ DEBUG: Ошибка алерта: ' + e.message, 'error');
     }
+} else {
+    debugLog('⚠️ DEBUG: Telegram WebApp недоступен - возможно режим разработки');
 }
 
 let currentBlock = 0;
@@ -200,10 +225,7 @@ function updateProgressIndicator() {
 
 // Сохранение имени
 async function submitName() {
-    // ОТЛАДКА: Сразу показываем что функция вызвана
-    if (Telegram.WebApp) {
-        Telegram.WebApp.showAlert('🔧 DEBUG: Функция submitName() запущена!');
-    }
+    debugLog('🔧 DEBUG: Функция submitName() запущена!');
     
     const nameInput = document.getElementById('nameInput');
     const inputError = document.getElementById('inputError');
@@ -218,10 +240,7 @@ async function submitName() {
     
     inputError.style.display = 'none';
     
-    // ОТЛАДКА: Показываем что начинаем API запрос
-    if (Telegram.WebApp) {
-        Telegram.WebApp.showAlert(`🔧 DEBUG: Начинаем сохранение имени "${name}"`);
-    }
+    debugLog(`🔧 DEBUG: Начинаем сохранение имени "${name}"`);
     
     try {
         const btn = document.querySelector('.btn');
@@ -231,27 +250,21 @@ async function submitName() {
         
         // Проверяем наличие telegram_id
         if (!userData.telegram_id) {
-            console.warn('⚠️ Отсутствует telegram_id, создаем временный ID для тестирования');
+            debugLog('⚠️ Отсутствует telegram_id, создаем временный ID для тестирования');
             userData.telegram_id = Date.now(); // Временный ID для тестирования
         }
         
-        console.log('🚀 Данные пользователя:', userData);
+        debugLog('🚀 Данные пользователя: ' + JSON.stringify(userData));
         
         // Сначала убеждаемся что пользователь существует
+        debugLog('👤 Создаем/обновляем пользователя...');
         await createOrUpdateUser();
+        debugLog('✅ Пользователь создан/обновлен');
         
         const url = getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id });
-        console.log('📤 Отправляем PATCH запрос на:', url);
-        console.log('📦 Данные для отправки:', { name: name });
-        console.log('🔐 Заголовки:', {
-            'Content-Type': 'application/json',
-            'X-Telegram-Init-Data': CONFIG.TELEGRAM.initData || 'DEBUG_MODE'
-        });
-        
-        // ОТЛАДКА: Показываем URL и данные перед запросом
-        if (Telegram.WebApp) {
-            Telegram.WebApp.showAlert(`🔧 DEBUG: Отправляем запрос на ${url} с telegram_id: ${userData.telegram_id}`);
-        }
+        debugLog('📤 Отправляем PATCH запрос на: ' + url);
+        debugLog('📦 Данные для отправки: ' + JSON.stringify({ name: name }));
+        debugLog('🔐 Заголовки: X-Telegram-Init-Data = ' + (CONFIG.TELEGRAM.initData || 'DEBUG_MODE'));
         
         const response = await fetch(url, {
             method: 'PATCH',
@@ -262,23 +275,17 @@ async function submitName() {
             body: JSON.stringify({ name: name })
         });
         
-        console.log('📥 Response status:', response.status);
-        console.log('📥 Response headers:', [...response.headers.entries()]);
-        
-        // ОТЛАДКА: Показываем статус ответа
-        if (Telegram.WebApp) {
-            Telegram.WebApp.showAlert(`🔧 DEBUG: Получен ответ со статусом ${response.status}`);
-        }
+        debugLog('📥 Response status: ' + response.status);
         
         if (response.ok) {
             const result = await response.json();
-            console.log('✅ Имя сохранено успешно:', result);
+            debugLog('✅ Имя сохранено успешно: ' + JSON.stringify(result));
             userData.name = name;
             currentBlock++;
             renderBlock(currentBlock);
         } else {
             const errorText = await response.text();
-            console.error('❌ Ошибка сервера:', response.status, errorText);
+            debugLog('❌ Ошибка сервера: ' + response.status + ' - ' + errorText, 'error');
             
             // Пытаемся парсить JSON ошибку
             let errorMessage = `Ошибка ${response.status}`;
@@ -296,22 +303,22 @@ async function submitName() {
         btn.disabled = false;
         
     } catch (error) {
-        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА СОХРАНЕНИЯ ИМЕНИ:', error);
-        console.error('❌ Тип ошибки:', error.name);
-        console.error('❌ Сообщение ошибки:', error.message);
-        console.error('❌ Стек ошибки:', error.stack);
-        console.error('❌ URL запроса:', getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }));
-        console.error('❌ userData:', JSON.stringify(userData));
+        debugLog('❌ КРИТИЧЕСКАЯ ОШИБКА СОХРАНЕНИЯ ИМЕНИ: ' + error.message, 'error');
+        debugLog('❌ Тип ошибки: ' + error.name, 'error');
+        debugLog('❌ Стек ошибки: ' + (error.stack ? error.stack.slice(0, 200) : 'недоступен'), 'error');
+        debugLog('❌ URL запроса: ' + getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }), 'error');
+        debugLog('❌ userData: ' + JSON.stringify(userData), 'error');
         
         // Показываем детальную ошибку через алерт для отладки
         if (Telegram.WebApp) {
             try {
                 Telegram.WebApp.showAlert(`ОШИБКА:\n${error.message}\n\nURL: ${getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id })}`);
+                debugLog('✅ Алерт с ошибкой показан');
             } catch (alertError) {
-                console.error('❌ Не удалось показать алерт:', alertError);
+                debugLog('❌ Не удалось показать алерт: ' + alertError.message, 'error');
             }
         } else {
-            console.log('❌ Telegram.WebApp недоступен для алерта');
+            debugLog('❌ Telegram.WebApp недоступен для алерта');
         }
         
         // Показываем более детальную ошибку пользователю
