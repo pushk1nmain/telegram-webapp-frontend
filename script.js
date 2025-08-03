@@ -32,7 +32,7 @@ function initTelegramWebApp() {
             
             
             // Автоматически создаем/обновляем пользователя в БД
-            createOrUpdateUser();
+            // Пользователь уже создан в боте при /start, только получаем данные
         }
         
         // Обработчик кнопки "Назад" в Telegram
@@ -185,6 +185,7 @@ function updateProgressIndicator() {
 }
 
 // Сохранение имени
+// Сохранение имени
 async function submitName() {
     const nameInput = document.getElementById('nameInput');
     const inputError = document.getElementById('inputError');
@@ -205,16 +206,16 @@ async function submitName() {
         btn.textContent = 'Сохраняем...';
         btn.disabled = true;
         
-        // Сначала убеждаемся, что пользователь создан в БД
+        // Проверяем наличие telegram_id
         if (!userData.telegram_id) {
             throw new Error('Ошибка: не найден Telegram ID');
         }
         
-        // Создаем или получаем пользователя
-        await createOrUpdateUser();
+        const url = getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id });
+        console.log('Отправляем PATCH запрос на:', url);
+        console.log('Данные:', { name: name });
         
-        // Теперь обновляем имя через PATCH
-        const response = await fetch(getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }), {
+        const response = await fetch(url, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -224,26 +225,29 @@ async function submitName() {
         });
         
         console.log('Response status:', response.status);
-        console.log('Request URL:', getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }));
         
         if (response.ok) {
             const result = await response.json();
-            console.log('Имя сохранено:', result);
+            console.log('✅ Имя сохранено успешно:', result);
             userData.name = name;
             currentBlock++;
             renderBlock(currentBlock);
         } else {
             const errorText = await response.text();
-            console.error('Ошибка сервера:', response.status, errorText);
-            throw new Error(`Ошибка сервера: ${response.status}`);
+            console.error('❌ Ошибка сервера:', response.status, errorText);
+            throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
         }
+        
+        btn.textContent = originalText;
+        btn.disabled = false;
+        
     } catch (error) {
-        console.error('Ошибка сохранения имени:', error);
+        console.error('❌ Ошибка сохранения имени:', error);
         inputError.textContent = 'Ошибка сохранения. Попробуйте еще раз.';
         inputError.style.display = 'block';
         
         const btn = document.querySelector('.btn');
-        btn.textContent = originalText;
+        btn.textContent = originalText || 'Сохранить имя';
         btn.disabled = false;
     }
 }
