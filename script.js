@@ -205,6 +205,15 @@ async function submitName() {
         btn.textContent = 'Сохраняем...';
         btn.disabled = true;
         
+        // Сначала убеждаемся, что пользователь создан в БД
+        if (!userData.telegram_id) {
+            throw new Error('Ошибка: не найден Telegram ID');
+        }
+        
+        // Создаем или получаем пользователя
+        await createOrUpdateUser();
+        
+        // Теперь обновляем имя через PATCH
         const response = await fetch(getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }), {
             method: 'PATCH',
             headers: {
@@ -214,15 +223,22 @@ async function submitName() {
             body: JSON.stringify({ name: name })
         });
         
+        console.log('Response status:', response.status);
+        console.log('Request URL:', getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }));
+        
         if (response.ok) {
+            const result = await response.json();
+            console.log('Имя сохранено:', result);
             userData.name = name;
             currentBlock++;
             renderBlock(currentBlock);
         } else {
-            throw new Error('Ошибка сохранения');
+            const errorText = await response.text();
+            console.error('Ошибка сервера:', response.status, errorText);
+            throw new Error(`Ошибка сервера: ${response.status}`);
         }
     } catch (error) {
-        console.error('Ошибка:', error);
+        console.error('Ошибка сохранения имени:', error);
         inputError.textContent = 'Ошибка сохранения. Попробуйте еще раз.';
         inputError.style.display = 'block';
         

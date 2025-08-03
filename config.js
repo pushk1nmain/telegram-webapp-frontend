@@ -18,7 +18,7 @@ const CONFIG = {
     
     ENDPOINTS: {
         USERS: '/users',                    // POST для создания
-        USER_UPDATE: '/users/{telegram_id}', // PUT для обновления  
+        USER_UPDATE: "/users/{telegram_id}", // PATCH для обновления
         HEALTH: '/health'                   // GET для проверки
     },
     
