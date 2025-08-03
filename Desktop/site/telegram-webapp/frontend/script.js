@@ -186,6 +186,11 @@ function updateProgressIndicator() {
 
 // Сохранение имени
 async function submitName() {
+    // ОТЛАДКА: Сразу показываем что функция вызвана
+    if (Telegram.WebApp) {
+        Telegram.WebApp.showAlert('🔧 DEBUG: Функция submitName() запущена!');
+    }
+    
     const nameInput = document.getElementById('nameInput');
     const inputError = document.getElementById('inputError');
     const name = nameInput.value.trim();
@@ -198,6 +203,11 @@ async function submitName() {
     }
     
     inputError.style.display = 'none';
+    
+    // ОТЛАДКА: Показываем что начинаем API запрос
+    if (Telegram.WebApp) {
+        Telegram.WebApp.showAlert(`🔧 DEBUG: Начинаем сохранение имени "${name}"`);
+    }
     
     try {
         const btn = document.querySelector('.btn');
@@ -224,6 +234,11 @@ async function submitName() {
             'X-Telegram-Init-Data': CONFIG.TELEGRAM.initData || 'DEBUG_MODE'
         });
         
+        // ОТЛАДКА: Показываем URL и данные перед запросом
+        if (Telegram.WebApp) {
+            Telegram.WebApp.showAlert(`🔧 DEBUG: Отправляем запрос на ${url} с telegram_id: ${userData.telegram_id}`);
+        }
+        
         const response = await fetch(url, {
             method: 'PATCH',
             headers: {
@@ -235,6 +250,11 @@ async function submitName() {
         
         console.log('📥 Response status:', response.status);
         console.log('📥 Response headers:', [...response.headers.entries()]);
+        
+        // ОТЛАДКА: Показываем статус ответа
+        if (Telegram.WebApp) {
+            Telegram.WebApp.showAlert(`🔧 DEBUG: Получен ответ со статусом ${response.status}`);
+        }
         
         if (response.ok) {
             const result = await response.json();
