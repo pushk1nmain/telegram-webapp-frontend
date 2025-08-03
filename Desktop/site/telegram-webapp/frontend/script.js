@@ -1,9 +1,16 @@
 // Telegram WebApp интеграция
-// ОТЛАДКА: Показываем что новый код загрузился
+// ОТЛАДКА: Показываем что новый код загрузился  
+console.log('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v4');
+console.log('🔧 DEBUG: Telegram.WebApp доступен:', typeof Telegram !== 'undefined' && Telegram.WebApp ? 'ДА' : 'НЕТ');
+
+// Пробуем и алерт и консоль
 if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-    Telegram.WebApp.showAlert('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v3');
-} else {
-    console.log('🚀 DEBUG: Новый код загружен! Версия: 2024-08-03-v3 (без Telegram)');
+    try {
+        Telegram.WebApp.showAlert('🚀 DEBUG: Новый код загружен! v4');
+        console.log('✅ DEBUG: Алерт отправлен');
+    } catch (e) {
+        console.log('❌ DEBUG: Ошибка алерта:', e);
+    }
 }
 
 let currentBlock = 0;
@@ -289,17 +296,26 @@ async function submitName() {
         btn.disabled = false;
         
     } catch (error) {
-        console.error('❌ Полная ошибка сохранения имени:', error);
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА СОХРАНЕНИЯ ИМЕНИ:', error);
+        console.error('❌ Тип ошибки:', error.name);
+        console.error('❌ Сообщение ошибки:', error.message);
+        console.error('❌ Стек ошибки:', error.stack);
+        console.error('❌ URL запроса:', getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id }));
+        console.error('❌ userData:', JSON.stringify(userData));
         
         // Показываем детальную ошибку через алерт для отладки
         if (Telegram.WebApp) {
-            Telegram.WebApp.showAlert(`ОШИБКА ОТЛАДКИ:\n${error.message}\n\nТип: ${error.name}\nСтек: ${error.stack?.slice(0, 200)}`);
+            try {
+                Telegram.WebApp.showAlert(`ОШИБКА:\n${error.message}\n\nURL: ${getApiUrl(CONFIG.ENDPOINTS.USER_UPDATE, { telegram_id: userData.telegram_id })}`);
+            } catch (alertError) {
+                console.error('❌ Не удалось показать алерт:', alertError);
+            }
         } else {
-            alert(`ОШИБКА: ${error.message}`);
+            console.log('❌ Telegram.WebApp недоступен для алерта');
         }
         
         // Показываем более детальную ошибку пользователю
-        let userMessage = 'Ошибка сохранения. Попробуйте еще раз.';
+        let userMessage = `Ошибка: ${error.message}`;
         if (error.message.includes('404')) {
             userMessage = 'Пользователь не найден. Перезагрузите страницу.';
         } else if (error.message.includes('403')) {
